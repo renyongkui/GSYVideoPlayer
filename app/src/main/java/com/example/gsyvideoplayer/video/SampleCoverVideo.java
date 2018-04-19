@@ -22,7 +22,7 @@ public class SampleCoverVideo extends StandardGSYVideoPlayer {
 
     ImageView mCoverImage;
 
-    String mUrl;
+    String mCoverOriginUrl;
 
     int mDefaultRes;
 
@@ -42,6 +42,11 @@ public class SampleCoverVideo extends StandardGSYVideoPlayer {
     protected void init(Context context) {
         super.init(context);
         mCoverImage = (ImageView) findViewById(R.id.thumbImage);
+
+        if (mThumbImageViewLayout != null &&
+                (mCurrentState == -1 || mCurrentState == CURRENT_STATE_NORMAL || mCurrentState == CURRENT_STATE_ERROR)) {
+            mThumbImageViewLayout.setVisibility(VISIBLE);
+        }
     }
 
     @Override
@@ -50,7 +55,7 @@ public class SampleCoverVideo extends StandardGSYVideoPlayer {
     }
 
     public void loadCoverImage(String url, int res) {
-        mUrl = url;
+        mCoverOriginUrl = url;
         mDefaultRes = res;
         Glide.with(getContext().getApplicationContext())
                 .setDefaultRequestOptions(
@@ -67,7 +72,7 @@ public class SampleCoverVideo extends StandardGSYVideoPlayer {
     public GSYBaseVideoPlayer startWindowFullscreen(Context context, boolean actionBar, boolean statusBar) {
         GSYBaseVideoPlayer gsyBaseVideoPlayer = super.startWindowFullscreen(context, actionBar, statusBar);
         SampleCoverVideo sampleCoverVideo = (SampleCoverVideo) gsyBaseVideoPlayer;
-        sampleCoverVideo.loadCoverImage(mUrl, mDefaultRes);
+        sampleCoverVideo.loadCoverImage(mCoverOriginUrl, mDefaultRes);
         return gsyBaseVideoPlayer;
     }
 }

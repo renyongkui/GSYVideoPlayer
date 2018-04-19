@@ -13,14 +13,13 @@ import android.widget.RelativeLayout;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.example.gsyvideoplayer.listener.SampleListener;
 import com.example.gsyvideoplayer.model.SwitchVideoModel;
 import com.example.gsyvideoplayer.video.SampleVideo;
-import com.shuyu.gsyvideoplayer.utils.Debuger;
+import com.shuyu.gsyvideoplayer.GSYVideoManager;
+import com.shuyu.gsyvideoplayer.listener.GSYSampleCallBack;
 import com.shuyu.gsyvideoplayer.video.base.GSYVideoPlayer;
 import com.shuyu.gsyvideoplayer.listener.LockClickListener;
 import com.shuyu.gsyvideoplayer.utils.OrientationUtils;
-import com.shuyu.gsyvideoplayer.video.StandardGSYVideoPlayer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -63,7 +62,7 @@ public class DetailMoreTypeActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         String source1 = "http://9890.vod.myqcloud.com/9890_4e292f9a3dd011e6b4078980237cc3d3.f20.mp4";
-        //String source1 = "http://baobab.wdjcdn.com/14564977406580.mp4";
+        //String source1 = "https://res.exexm.com/cw_145225549855002";
         String name = "普通";
         SwitchVideoModel switchVideoModel = new SwitchVideoModel(name, source1);
 
@@ -95,27 +94,31 @@ public class DetailMoreTypeActivity extends AppCompatActivity {
         //关闭自动旋转
         detailPlayer.setRotateViewAuto(false);
         detailPlayer.setLockLand(false);
-        detailPlayer.setShowFullAnimation(false);
+
+        //打开  实现竖屏全屏动画
+        detailPlayer.setShowFullAnimation(true);
+
         detailPlayer.setNeedLockFull(true);
         detailPlayer.setSeekRatio(1);
         //detailPlayer.setOpenPreView(false);
         detailPlayer.getFullscreenButton().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //直接横屏
-                orientationUtils.resolveByClick();
+                //屏蔽，实现竖屏全屏
+                //orientationUtils.resolveByClick();
 
                 //第一个true是否需要隐藏actionbar，第二个true是否需要隐藏statusbar
                 detailPlayer.startWindowFullscreen(DetailMoreTypeActivity.this, true, true);
             }
         });
 
-        detailPlayer.setStandardVideoAllCallBack(new SampleListener() {
+        detailPlayer.setVideoAllCallBack(new GSYSampleCallBack() {
             @Override
             public void onPrepared(String url, Object... objects) {
                 super.onPrepared(url, objects);
                 //开始播放了才能旋转和全屏
-                orientationUtils.setEnable(true);
+                //orientationUtils.setEnable(true);
+                orientationUtils.setEnable(false);
                 isPlay = true;
             }
 
@@ -132,19 +135,21 @@ public class DetailMoreTypeActivity extends AppCompatActivity {
             @Override
             public void onQuitFullscreen(String url, Object... objects) {
                 super.onQuitFullscreen(url, objects);
-                if (orientationUtils != null) {
-                    orientationUtils.backToProtVideo();
-                }
+                //屏蔽，实现竖屏全屏
+                //if (orientationUtils != null) {
+                    //orientationUtils.backToProtVideo();
+                //}
             }
         });
 
         detailPlayer.setLockClickListener(new LockClickListener() {
             @Override
             public void onClick(View view, boolean lock) {
-                if (orientationUtils != null) {
+                //屏蔽，实现竖屏全屏
+                //if (orientationUtils != null) {
                     //配合下方的onConfigurationChanged
-                    orientationUtils.setEnable(!lock);
-                }
+                    //orientationUtils.setEnable(!lock);
+                //}
             }
         });
 
@@ -158,7 +163,7 @@ public class DetailMoreTypeActivity extends AppCompatActivity {
             orientationUtils.backToProtVideo();
         }
 
-        if (StandardGSYVideoPlayer.backFromWindowFull(this)) {
+        if (GSYVideoManager.backFromWindowFull(this)) {
             return;
         }
         super.onBackPressed();
@@ -200,8 +205,10 @@ public class DetailMoreTypeActivity extends AppCompatActivity {
         super.onConfigurationChanged(newConfig);
         //如果旋转了就全屏
         if (isPlay && !isPause) {
-            detailPlayer.onConfigurationChanged(this, newConfig, orientationUtils);
+            detailPlayer.onConfigurationChanged(this, newConfig, orientationUtils, true, true);
         }
+        //竖屏全屏
+        orientationUtils.setEnable(false);
     }
 
 

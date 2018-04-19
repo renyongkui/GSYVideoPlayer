@@ -1,6 +1,5 @@
 package com.example.gsyvideoplayer;
 
-import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.widget.NestedScrollView;
@@ -9,25 +8,20 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
-import com.example.gsyvideoplayer.listener.SampleListener;
 import com.example.gsyvideoplayer.video.LandLayoutVideo;
 import com.shuyu.gsyvideoplayer.GSYVideoManager;
-import com.shuyu.gsyvideoplayer.model.VideoOptionModel;
+import com.shuyu.gsyvideoplayer.listener.GSYSampleCallBack;
+import com.shuyu.gsyvideoplayer.listener.GSYVideoProgressListener;
 import com.shuyu.gsyvideoplayer.video.base.GSYVideoPlayer;
 
 import com.shuyu.gsyvideoplayer.builder.GSYVideoOptionBuilder;
 import com.shuyu.gsyvideoplayer.listener.LockClickListener;
 import com.shuyu.gsyvideoplayer.utils.Debuger;
 import com.shuyu.gsyvideoplayer.utils.OrientationUtils;
-import com.shuyu.gsyvideoplayer.video.StandardGSYVideoPlayer;
 
-
-import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 
 
 public class DetailPlayer extends AppCompatActivity {
@@ -54,10 +48,29 @@ public class DetailPlayer extends AppCompatActivity {
         setContentView(R.layout.activity_detail_player);
         ButterKnife.bind(this);
 
-        //断网自动重新链接，url前接上ijkhttphook:
-        //String url = "ijkhttphook:http://baobab.wdjcdn.com/14564977406580.mp4";
+        //String url = "android.resource://" + getPackageName() + "/" + R.raw.test;
+        //注意，用ijk模式播放raw视频，这个必须打开
+        //GSYVideoManager.instance().enableRawPlay(getApplicationContext());
 
-        //String url = "http://baobab.wdjcdn.com/14564977406580.mp4";
+        //断网自动重新链接，url前接上ijkhttphook:
+        //String url = "ijkhttphook:https://res.exexm.com/cw_145225549855002";
+
+        String url = "http://7xjmzj.com1.z0.glb.clouddn.com/20171026175005_JObCxCE2.mp4";
+
+        //String url =  "http://video.7k.cn/app_video/20171202/6c8cf3ea/v.m3u8.mp4";
+        //String url =  "http://devimages.apple.com.edgekey.net/streaming/examples/bipbop_4x3/bipbop_4x3_variant.m3u8";
+        //String url =  "https://cdn61.ytbbs.tv/cn/tv/55550/55550-1/play.m3u8?md5=v4sI4lWlo4XojzeAjgBGaQ&expires=1521204012&token=55550";
+        //String url =  "http://1253492636.vod2.myqcloud.com/2e5fc148vodgzp1253492636/d08af82d4564972819086152830/plHZZoSkje0A.mp4";
+
+        //String url = "rtsp://ajj:12345678@218.21.217.122:65523/h264/ch40/sub/av_stream";
+        //String url = "rtsp://ajj:ajj12345678@218.21.217.122:65522/h264/ch15/sub/av_stream";//String url =  "rtsp://cloud.easydarwin.org:554/stream0.sdp";
+        //String url =  "http://s.swao.cn/o_1c4gm8o1nniu1had13bk1t0l1rq64m.mov";
+        //String url =  "http://api.ciguang.tv/avideo/play?num=02-041-0491&type=flv&v=1&client=android";
+        //String url = "http://video.7k.cn/app_video/20171213/276d8195/v.m3u8.mp4";
+        //String url = "http://103.233.191.21/riak/riak-bucket/6469ac502e813a4c1df7c99f364e70c1.mp4";
+        //String url = "http://7xjmzj.com1.z0.glb.clouddn.com/20171026175005_JObCxCE2.mp4";
+        //String url = "https://media6.smartstudy.com/ae/07/3997/2/dest.m3u8";
+        //String url = "http://cdn.tiaobatiaoba.com/Upload/square/2017-11-02/1509585140_1279.mp4";
 
         //String url = "http://hcjs2ra2rytd8v8np1q.exp.bcevod.com/mda-hegtjx8n5e8jt9zv/mda-hegtjx8n5e8jt9zv.m3u8";
         //String url = "http://7xse1z.com1.z0.glb.clouddn.com/1491813192";
@@ -67,7 +80,7 @@ public class DetailPlayer extends AppCompatActivity {
         //String url = "http://pl-ali.youku.com/playlist/m3u8?type=mp4&ts=1490185963&keyframe=0&vid=XMjYxOTQ1Mzg2MA==&ep=ciadGkiFU8cF4SvajD8bYyuwJiYHXJZ3rHbN%2FrYDAcZuH%2BrC6DPcqJ21TPs%3D&sid=04901859548541247bba8&token=0524&ctype=12&ev=1&oip=976319194";
         //String url = "http://hls.ciguang.tv/hdtv/video.m3u8";
         //String url = "https://res.exexm.com/cw_145225549855002";
-        String url = "http://storage.gzstv.net/uploads/media/huangmeiyan/jr05-09.mp4";//mepg
+        //String url = "http://storage.gzstv.net/uploads/media/huangmeiyan/jr05-09.mp4";//mepg
 
         //detailPlayer.setUp(url, false, null, "测试视频");
         //detailPlayer.setLooping(true);
@@ -108,7 +121,7 @@ public class DetailPlayer extends AppCompatActivity {
                 .setUrl(url)
                 .setCacheWithPlay(false)
                 .setVideoTitle("测试视频")
-                .setStandardVideoAllCallBack(new SampleListener() {
+                .setVideoAllCallBack(new GSYSampleCallBack() {
                     @Override
                     public void onPrepared(String url, Object... objects) {
                         Debuger.printfError("***** onPrepared **** " + objects[0]);
@@ -154,7 +167,14 @@ public class DetailPlayer extends AppCompatActivity {
                             orientationUtils.setEnable(!lock);
                         }
                     }
-                }).build(detailPlayer);
+                })
+                .setGSYVideoProgressListener(new GSYVideoProgressListener() {
+                    @Override
+                    public void onProgress(int progress, int secProgress, int currentPosition, int duration) {
+                        Debuger.printfLog(" progress " + progress + " secProgress " + secProgress + " currentPosition " + currentPosition + " duration " + duration);
+                    }
+                })
+                .build(detailPlayer);
 
         detailPlayer.getFullscreenButton().setOnClickListener(new View.OnClickListener() {
             @Override
@@ -166,7 +186,6 @@ public class DetailPlayer extends AppCompatActivity {
                 detailPlayer.startWindowFullscreen(DetailPlayer.this, true, true);
             }
         });
-
     }
 
     @Override
@@ -176,7 +195,7 @@ public class DetailPlayer extends AppCompatActivity {
             orientationUtils.backToProtVideo();
         }
 
-        if (StandardGSYVideoPlayer.backFromWindowFull(this)) {
+        if (GSYVideoManager.backFromWindowFull(this)) {
             return;
         }
         super.onBackPressed();
@@ -192,7 +211,7 @@ public class DetailPlayer extends AppCompatActivity {
 
     @Override
     protected void onResume() {
-        getCurPlay().onVideoResume();
+        getCurPlay().onVideoResume(false);
         super.onResume();
         isPause = false;
     }
@@ -215,7 +234,7 @@ public class DetailPlayer extends AppCompatActivity {
         super.onConfigurationChanged(newConfig);
         //如果旋转了就全屏
         if (isPlay && !isPause) {
-            detailPlayer.onConfigurationChanged(this, newConfig, orientationUtils);
+            detailPlayer.onConfigurationChanged(this, newConfig, orientationUtils, true, true);
         }
     }
 

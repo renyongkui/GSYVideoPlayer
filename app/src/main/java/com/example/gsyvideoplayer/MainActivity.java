@@ -29,7 +29,9 @@ public class MainActivity extends AppCompatActivity {
         ButterKnife.bind(this);
     }
 
-    @OnClick({R.id.open_btn, R.id.list_btn, R.id.list_btn_2, R.id.list_detail, R.id.clear_cache, R.id.recycler, R.id.recycler_2, R.id.list_detail_list, R.id.web_detail, R.id.danmaku_video, R.id.fragment_video, R.id.more_type, R.id.input_type, R.id.open_btn_empty, R.id.open_control})
+    @OnClick({R.id.open_btn, R.id.list_btn, R.id.list_btn_2, R.id.list_detail, R.id.clear_cache, R.id.recycler, R.id.recycler_2, R.id.list_detail_list, R.id.web_detail, R.id.danmaku_video, R.id.fragment_video,
+            R.id.more_type, R.id.input_type, R.id.open_btn_empty, R.id.open_control, R.id.open_filter, R.id.open_btn_pick, R.id.open_btn_auto, R.id.open_scroll, R.id.open_window, R.id.open_btn_ad,
+            R.id.open_btn_multi, R.id.open_btn_ad2, R.id.open_list_ad})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.open_btn:
@@ -85,11 +87,45 @@ public class MainActivity extends AppCompatActivity {
             case R.id.open_control:
                 JumpUtils.gotoControl(this);
                 break;
-
+            case R.id.open_filter:
+                JumpUtils.gotoFilter(this);
+                break;
+            case R.id.open_btn_pick:
+                //无缝切换
+                JumpUtils.goToVideoPickPlayer(this, openBtn);
+                break;
+            case R.id.open_btn_auto:
+                //列表自动播放
+                JumpUtils.goToAutoVideoPlayer(this);
+                break;
+            case R.id.open_scroll:
+                //列表自动播放
+                JumpUtils.goToScrollDetailPlayer(this);
+                break;
+            case R.id.open_window:
+                //多窗体下的悬浮窗
+                JumpUtils.goToScrollWindow(this);
+                break;
+            case R.id.open_btn_ad:
+                //广告
+                JumpUtils.goToVideoADPlayer(this);
+                break;
+            case R.id.open_btn_multi:
+                //多个同时播放
+                JumpUtils.goToMultiVideoPlayer(this);
+                break;
+            case R.id.open_btn_ad2:
+                //多个同时播放
+                JumpUtils.goToVideoADPlayer2(this);
+                break;
+            case R.id.open_list_ad:
+                //多个同时播放
+                JumpUtils.goToADListVideoPlayer(this);
+                break;
             case R.id.clear_cache:
                 //清理缓存
                 GSYVideoManager.clearAllDefaultCache(MainActivity.this);
-                //String url = "http://baobab.wdjcdn.com/14564977406580.mp4";
+                //String url = "https://res.exexm.com/cw_145225549855002";
                 //GSYVideoManager.clearDefaultCache(MainActivity.this, url);
                 break;
         }

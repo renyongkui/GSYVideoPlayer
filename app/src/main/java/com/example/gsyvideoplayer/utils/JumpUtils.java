@@ -7,21 +7,30 @@ import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.util.Pair;
 import android.view.View;
 
+import com.example.gsyvideoplayer.AutoPlayRecyclerViewActivity;
 import com.example.gsyvideoplayer.DanmkuVideoActivity;
+import com.example.gsyvideoplayer.DetailADPlayer;
+import com.example.gsyvideoplayer.DetailADPlayer2;
 import com.example.gsyvideoplayer.DetailControlActivity;
+import com.example.gsyvideoplayer.DetailFilterActivity;
 import com.example.gsyvideoplayer.DetailListPlayer;
 import com.example.gsyvideoplayer.DetailMoreTypeActivity;
 import com.example.gsyvideoplayer.DetailPlayer;
 import com.example.gsyvideoplayer.FragmentVideoActivity;
 import com.example.gsyvideoplayer.InputUrlDetailActivity;
+import com.example.gsyvideoplayer.ListADVideoActivity;
+import com.example.gsyvideoplayer.ListMultiVideoActivity;
 import com.example.gsyvideoplayer.ListVideo2Activity;
 import com.example.gsyvideoplayer.ListVideoActivity;
 import com.example.gsyvideoplayer.PlayActivity;
 import com.example.gsyvideoplayer.PlayEmptyControlActivity;
+import com.example.gsyvideoplayer.PlayPickActivity;
 import com.example.gsyvideoplayer.R;
 import com.example.gsyvideoplayer.RecyclerView2Activity;
 import com.example.gsyvideoplayer.RecyclerViewActivity;
+import com.example.gsyvideoplayer.ScrollingActivity;
 import com.example.gsyvideoplayer.WebDetailActivity;
+import com.example.gsyvideoplayer.WindowActivity;
 
 /**
  * Created by shuyu on 2016/11/11.
@@ -37,6 +46,26 @@ public class JumpUtils {
      */
     public static void goToVideoPlayer(Activity activity, View view) {
         Intent intent = new Intent(activity, PlayActivity.class);
+        intent.putExtra(PlayActivity.TRANSITION, true);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            Pair pair = new Pair<>(view, PlayActivity.IMG_TRANSITION);
+            ActivityOptionsCompat activityOptions = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                    activity, pair);
+            ActivityCompat.startActivity(activity, intent, activityOptions.toBundle());
+        } else {
+            activity.startActivity(intent);
+            activity.overridePendingTransition(R.anim.abc_fade_in, R.anim.abc_fade_out);
+        }
+    }
+
+    /**
+     * 跳转到视频播放
+     *
+     * @param activity
+     * @param view
+     */
+    public static void goToVideoPickPlayer(Activity activity, View view) {
+        Intent intent = new Intent(activity, PlayPickActivity.class);
         intent.putExtra(PlayActivity.TRANSITION, true);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
             Pair pair = new Pair<>(view, PlayActivity.IMG_TRANSITION);
@@ -76,6 +105,17 @@ public class JumpUtils {
      */
     public static void goToVideoPlayer(Activity activity) {
         Intent intent = new Intent(activity, ListVideoActivity.class);
+        ActivityOptionsCompat activityOptions = ActivityOptionsCompat.makeSceneTransitionAnimation(activity);
+        ActivityCompat.startActivity(activity, intent, activityOptions.toBundle());
+    }
+
+    /**
+     * 跳转到视频列表
+     *
+     * @param activity
+     */
+    public static void goToAutoVideoPlayer(Activity activity) {
+        Intent intent = new Intent(activity, AutoPlayRecyclerViewActivity.class);
         ActivityOptionsCompat activityOptions = ActivityOptionsCompat.makeSceneTransitionAnimation(activity);
         ActivityCompat.startActivity(activity, intent, activityOptions.toBundle());
     }
@@ -128,10 +168,78 @@ public class JumpUtils {
      *
      * @param activity
      */
+    public static void goToScrollDetailPlayer(Activity activity) {
+        Intent intent = new Intent(activity, ScrollingActivity.class);
+        activity.startActivity(intent);
+    }
+
+    /**
+     * 跳转到AD详情播放
+     *
+     * @param activity
+     */
+    public static void goToVideoADPlayer(Activity activity) {
+        Intent intent = new Intent(activity, DetailADPlayer.class);
+        activity.startActivity(intent);
+    }
+
+    /**
+     * 跳转到多个同时播放
+     *
+     * @param activity
+     */
+    public static void goToMultiVideoPlayer(Activity activity) {
+        Intent intent = new Intent(activity, ListMultiVideoActivity.class);
+        ActivityOptionsCompat activityOptions = ActivityOptionsCompat.makeSceneTransitionAnimation(activity);
+        ActivityCompat.startActivity(activity, intent, activityOptions.toBundle());
+    }
+
+    /**
+     * 跳转列表带广告
+     *
+     * @param activity
+     */
+    public static void goToADListVideoPlayer(Activity activity) {
+        Intent intent = new Intent(activity, ListADVideoActivity.class);
+        ActivityOptionsCompat activityOptions = ActivityOptionsCompat.makeSceneTransitionAnimation(activity);
+        ActivityCompat.startActivity(activity, intent, activityOptions.toBundle());
+    }
+
+
+
+
+    /**
+     * 跳转到详情播放
+     *
+     * @param activity
+     */
+    public static void goToScrollWindow(Activity activity) {
+        Intent intent = new Intent(activity, WindowActivity.class);
+        activity.startActivity(intent);
+    }
+
+    /**
+     * 跳转到详情播放
+     *
+     * @param activity
+     */
     public static void goToDetailListPlayer(Activity activity) {
         Intent intent = new Intent(activity, DetailListPlayer.class);
         activity.startActivity(intent);
     }
+
+
+    /**
+     * 跳转到带广告的
+     *
+     * @param activity
+     */
+    public static void goToVideoADPlayer2(Activity activity) {
+        Intent intent = new Intent(activity, DetailADPlayer2.class);
+        activity.startActivity(intent);
+    }
+
+
 
 
     /**
@@ -193,4 +301,15 @@ public class JumpUtils {
         Intent intent = new Intent(activity, DetailControlActivity.class);
         activity.startActivity(intent);
     }
+
+    /**
+     * 跳到滤镜
+     *
+     * @param activity
+     */
+    public static void gotoFilter(Activity activity) {
+        Intent intent = new Intent(activity, DetailFilterActivity.class);
+        activity.startActivity(intent);
+    }
+
 }

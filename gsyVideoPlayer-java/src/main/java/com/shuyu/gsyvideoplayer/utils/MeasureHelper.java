@@ -19,6 +19,7 @@ package com.shuyu.gsyvideoplayer.utils;
 
 import android.view.View;
 
+
 import java.lang.ref.WeakReference;
 
 public final class MeasureHelper {
@@ -36,9 +37,13 @@ public final class MeasureHelper {
 
     private int mCurrentAspectRatio = GSYVideoType.SCREEN_TYPE_DEFAULT;
 
-    public MeasureHelper(View view) {
-        mWeakView = new WeakReference<View>(view);
+    private final MeasureFormVideoParamsListener mParamsListener;
+
+    public MeasureHelper(View view, MeasureFormVideoParamsListener listener) {
+        mParamsListener = listener;
+        mWeakView = new WeakReference<>(view);
     }
+
 
     public View getView() {
         if (mWeakView == null)
@@ -72,7 +77,7 @@ public final class MeasureHelper {
 
         if (mVideoRotationDegree == 90 || mVideoRotationDegree == 270) {
             int tempSpec = widthMeasureSpec;
-            widthMeasureSpec  = heightMeasureSpec;
+            widthMeasureSpec = heightMeasureSpec;
             heightMeasureSpec = tempSpec;
         }
 
@@ -103,7 +108,7 @@ public final class MeasureHelper {
                         break;
                     case GSYVideoType.SCREEN_TYPE_DEFAULT:
                     case GSYVideoType.SCREEN_TYPE_FULL:
-                    //case GSYVideoType.AR_ASPECT_WRAP_CONTENT:
+                        //case GSYVideoType.AR_ASPECT_WRAP_CONTENT:
                     default:
                         displayAspectRatio = (float) mVideoWidth / (float) mVideoHeight;
                         if (mVideoSarNum > 0 && mVideoSarDen > 0)
@@ -202,6 +207,29 @@ public final class MeasureHelper {
         mMeasuredHeight = height;
     }
 
+
+    public void prepareMeasure(int widthMeasureSpec, int heightMeasureSpec, int rotate) {
+        if (mParamsListener != null) {
+            try {
+                int videoWidth = mParamsListener.getCurrentVideoWidth();
+                int videoHeight = mParamsListener.getCurrentVideoHeight();
+                Debuger.printfLog("videoWidth: " + videoWidth + " videoHeight: " + videoHeight);
+                int videoSarNum = mParamsListener.getVideoSarNum();
+                int videoSarDen = mParamsListener.getVideoSarDen();
+
+                if (videoWidth > 0 && videoHeight > 0) {
+                    setVideoSampleAspectRatio(videoSarNum, videoSarDen);
+                    setVideoSize(videoWidth, videoHeight);
+                }
+                setVideoRotation(rotate);
+                doMeasure(widthMeasureSpec, heightMeasureSpec);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
     public int getMeasuredWidth() {
         return mMeasuredWidth;
     }
@@ -212,6 +240,19 @@ public final class MeasureHelper {
 
     public void setAspectRatio(int aspectRatio) {
         mCurrentAspectRatio = aspectRatio;
+    }
+
+    /**
+     * 构造宽高所需要的视频相关参数
+     */
+    public interface MeasureFormVideoParamsListener {
+        int getCurrentVideoWidth();
+
+        int getCurrentVideoHeight();
+
+        int getVideoSarNum();
+
+        int getVideoSarDen();
     }
 
 }

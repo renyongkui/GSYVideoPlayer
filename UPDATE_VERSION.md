@@ -1,5 +1,217 @@
 ## 下方个版本说明，可以当做简单的wiki使用~，效果可参考DEMO。
 
+### 4.1.2(2018-04-14)
+* 修复已知问题。
+* 增加ijkplayer的raw播放支持。
+```
+String url = "android.resource://" + getPackageName() + "/" + R.raw.test;
+GSYVideoManager.instance().enableRawPlay(getApplicationContext());
+```
+* danmku分支提供网络弹幕demo
+
+### 4.1.1 (2018-04-01)
+* 1、update support lib to 26.0.2
+* 2、修复了渲染层在某些条件下，截图时返回大小不对问题。
+* 3、一些细节的优化处理。
+* 4、增加Manager的isFullState方法
+```
+ /*
+  * 当前是否全屏状态
+  *
+  * @return 当前是否全屏状态， true代表是。
+  */
+ public static boolean isFullState(Activity activity)
+```
+
+### 4.1.0 (2018-02-26)
+* 1、update to ijk 0.8.8
+* 2、去除cache模块的log库依赖
+* 3、去除exo模块的无用依赖
+* 4、增加恢复播放方法参数
+```
+ XXXXManager相关
+/**
+  * 恢复暂停状态
+  *
+  * @param seek 是否产生seek动作,直播设置为false
+  */
+ public static void onResume(String key, boolean seek)
+
+ Video相关
+ /**
+  * 恢复暂停状态
+  *
+  * @param seek 是否产生seek动作
+  */
+ @Override
+ public void onVideoResume(boolean seek)
+
+```
+
+### 4.0.0-beat1（2018-02-06）
+* 1、新增简单片头广告支持。
+`GSYSampleADVideoPlayer 与 DetailADPlayer`
+* 2、优化了ListGSYVideoPlayer、增加`playNext()`接口。
+* 3、优化代码结构，调整部分API接口（稍微调整下，偶尔有和旧版本不兼容的，参考源码和demo修改下方法名即可）。
+* 4、增加GSYVideoHelper视频帮助类，更加节省资源。
+* 5、增加GSYSampleCallBack节省继承，优化GSYVideoProgressListener的回调。
+* 6、增加GSYVideoViewBridge、重载`getGSYVideoManager()`方法实现自己的Manager。
+* 7、支持自定义渲染层，demo中`CustomRenderVideoPlayer`演示如何设置自定义渲染层。
+* 8、`ListMultiVideoActivity`和`MultiSampleVideo`演示如何同时播放多个视频。
+* 9、`DetailADPlayer2`和`ListADVideoActivity`演示广告与中间插入广告支持。
+* 10、增加音频焦点方法。
+```
+/**
+  * 长时间失去音频焦点，暂停播放器
+  *
+  * @param releaseWhenLossAudio 默认true，false的时候只会暂停
+  */
+ public void setReleaseWhenLossAudio(boolean releaseWhenLossAudio)
+
+```
+
+
+### 3.0.0（2018-01-14）
+
+1、增肌PlayerManager，更新为ExoPlayer2，优化对ExoPlayer2的支持。
+
+2、增加系统播放器AndroidMediaPlayer支持
+
+3、增对列表增加setUpLazy方法，优化列表中可能的滑动卡顿
+```
+    /**
+     * 在点击播放的时候才进行真正setup
+     */
+    public boolean setUpLazy(String url, boolean cacheWithPlay, File cachePath, Map<String, String> mapHeadData, String title)
+
+```
+4、优化GL渲染和处理切换渲染效果崩溃。
+
+
+
+5、DEMO增加SamllVideoHelper实现小窗口逻辑，更新demo
+
+
+
+6、优化触摸的音量、亮度、进度的弹出框，优化可自定义程度
+```
+    /**
+     * 触摸进度dialog的layoutId
+     * 继承后重写可返回自定义
+     * 有自定义的实现逻辑可重载showProgressDialog方法
+     */
+    protected int getProgressDialogLayoutId()
+    /**
+     * 触摸进度dialog的进度条id
+     * 继承后重写可返回自定义，如果没有可返回空
+     * 有自定义的实现逻辑可重载showProgressDialog方法
+     */
+    protected int getProgressDialogProgressId()
+
+    /**
+     * 触摸进度dialog的当前时间文本
+     * 继承后重写可返回自定义，如果没有可返回空
+     * 有自定义的实现逻辑可重载showProgressDialog方法
+     */
+    protected int getProgressDialogCurrentDurationTextId()
+
+    /**
+     * 触摸进度dialog全部时间文本
+     * 继承后重写可返回自定义，如果没有可返回空
+     * 有自定义的实现逻辑可重载showProgressDialog方法
+     */
+    protected int getProgressDialogAllDurationTextId()
+
+    /**
+     * 触摸进度dialog的图片id
+     * 继承后重写可返回自定义，如果没有可返回空
+     * 有自定义的实现逻辑可重载showProgressDialog方法
+     */
+    protected int getProgressDialogImageId()
+
+    /**
+     * 音量dialog的layoutId
+     * 继承后重写可返回自定义
+     * 有自定义的实现逻辑可重载showVolumeDialog方法
+     */
+    protected int getVolumeLayoutId()
+    /**
+     * 音量dialog的百分比进度条 id
+     * 继承后重写可返回自定义，如果没有可返回空
+     * 有自定义的实现逻辑可重载showVolumeDialog方法
+     */
+    protected int getVolumeProgressId()
+
+    /**
+     * 亮度dialog的layoutId
+     * 继承后重写可返回自定义
+     * 有自定义的实现逻辑可重载showBrightnessDialog方法
+     */
+    protected int getBrightnessLayoutId()
+
+    /**
+     * 亮度dialog的百分比text id
+     * 继承后重写可返回自定义，如果没有可返回空
+     * 有自定义的实现逻辑可重载showBrightnessDialog方法
+     */
+    protected int getBrightnessTextId()
+
+```
+
+
+### 2.1.3（2017-12-24）
+* update demo gradle to 4.1
+* 增加对CollapsingToolbarLayout的支持与demo
+* 多窗体下（包括桌面）的小窗口播放（WindowActivity）。
+* 增加播放进度回调
+```
+/**
+ * 进度回调
+ */
+public void setGSYVideoProgressListener(GSYVideoProgressListener videoProgressListener)
+```
+
+### 2.1.2(2017-12-08)
+* 增加针对Prepared之前调用OnVideoPause的处理
+* 背景视频模糊铺满，前方视频正常播放
+```
+DetailFilterActivity中注释的
+//高斯拉伸视频铺满背景，替换黑色，前台正常比例播放
+```
+
+
+### 2.1.1(2017-10-29)
+* videoCache模式支持增加header
+* 增加无缝切换视频DEMO SmartPickVideo
+* 调整部分代码路径，优化代码
+* log输入等级接口
+```
+GSYVideoManager.instance().setLogLevel(IjkMediaPlayer.IJK_LOG_SILENT);
+```
+
+### 2.1.0(2017-10-10)
+* 增加了视频帧合成gif功能（DEMO DetailControlActivity中）。
+* update ijkplayer 0.84
+
+### 2.0.9(2017-10-02)
+* 增加顶层效果渲染的动画效果。
+* 增加截图功能。
+* 增加自定义render支持。
+* 增加水印、多重播放等。
+
+
+### 2.0.8（2017-09-17）
+* 增加GSYBaseActivityDetail抽象类，方便detail模式集成。
+* 内部增加一些优化。
+* 增加简单滤镜功能支持。
+```
+1、全局设置
+GSYVideoType.setRenderType(GSYVideoType.GLSURFACE);
+2、设置滤镜
+player.setEffectFilter(new BarrelBlurEffect());
+```
+
+
 ### 2.0.7(2017-09-13）
 
 * 优化增加了断网自动续连，需要为http前加上 "ijkhttphook:http://ssss"
