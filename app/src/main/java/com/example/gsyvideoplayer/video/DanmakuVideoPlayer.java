@@ -3,6 +3,7 @@ package com.example.gsyvideoplayer.video;
 import android.content.Context;
 import android.graphics.Color;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -15,7 +16,13 @@ import com.shuyu.gsyvideoplayer.utils.Debuger;
 import com.shuyu.gsyvideoplayer.video.base.GSYBaseVideoPlayer;
 import com.shuyu.gsyvideoplayer.video.StandardGSYVideoPlayer;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 
 import master.flame.danmaku.controller.IDanmakuView;
@@ -33,14 +40,14 @@ import master.flame.danmaku.danmaku.parser.IDataSource;
 import master.flame.danmaku.ui.widget.DanmakuView;
 
 /**
- * Created by guoshuyu on 2017/2/16.
- * <p>
- * 配置弹幕使用的播放器，目前使用的是本地模拟数据。
- * <p>
- * 模拟数据的弹幕时常比较短，后面的时长点是没有数据的。
- * <p>
- * 注意：这只是一个例子，演示如何集合弹幕，需要完善如弹出输入弹幕等的，可以自行完善。
- * 注意：b站的弹幕so只有v5 v7 x86、没有64，所以记得配置上ndk过滤。
+ Created by guoshuyu on 2017/2/16.
+ <p>
+ 配置弹幕使用的播放器，目前使用的是本地模拟数据。
+ <p>
+ 模拟数据的弹幕时常比较短，后面的时长点是没有数据的。
+ <p>
+ 注意：这只是一个例子，演示如何集合弹幕，需要完善如弹出输入弹幕等的，可以自行完善。
+ 注意：b站的弹幕so只有v5 v7 x86、没有64，所以记得配置上ndk过滤。
  */
 
 public class DanmakuVideoPlayer extends StandardGSYVideoPlayer {
@@ -54,6 +61,8 @@ public class DanmakuVideoPlayer extends StandardGSYVideoPlayer {
     private long mDanmakuStartSeekPosition = -1;
 
     private boolean mDanmaKuShow = true;
+
+    private File mDumakuFile;
 
     public DanmakuVideoPlayer(Context context, Boolean fullFlag) {
         super(context, fullFlag);
@@ -98,19 +107,24 @@ public class DanmakuVideoPlayer extends StandardGSYVideoPlayer {
     @Override
     public void onVideoPause() {
         super.onVideoPause();
-        if (mDanmakuView != null && mDanmakuView.isPrepared()) {
-            mDanmakuView.pause();
-        }
+        danmakuOnPause();
     }
 
     @Override
-    public void onVideoResume() {
-        super.onVideoResume();
-        if (mDanmakuView != null && mDanmakuView.isPrepared() && mDanmakuView.isPaused()) {
-            mDanmakuView.resume();
-        }
+    public void onVideoResume(boolean isResume) {
+        super.onVideoResume(isResume);
+        danmakuOnResume();
     }
 
+    @Override
+    protected void clickStartIcon() {
+        super.clickStartIcon();
+        if (mCurrentState == CURRENT_STATE_PLAYING) {
+            danmakuOnResume();
+        } else if (mCurrentState == CURRENT_STATE_PAUSE) {
+            danmakuOnPause();
+        }
+    }
 
     @Override
     public void onCompletion() {
@@ -145,9 +159,15 @@ public class DanmakuVideoPlayer extends StandardGSYVideoPlayer {
         }
     }
 
+    @Override
+    protected void cloneParams(GSYBaseVideoPlayer from, GSYBaseVideoPlayer to) {
+        ((DanmakuVideoPlayer) to).mDumakuFile = ((DanmakuVideoPlayer) from).mDumakuFile;
+        super.cloneParams(from, to);
+    }
+
     /**
-     * 处理播放器在全屏切换时，弹幕显示的逻辑
-     * 需要格外注意的是，因为全屏和小屏，是切换了播放器，所以需要同步之间的弹幕状态
+     处理播放器在全屏切换时，弹幕显示的逻辑
+     需要格外注意的是，因为全屏和小屏，是切换了播放器，所以需要同步之间的弹幕状态
      */
     @Override
     public GSYBaseVideoPlayer startWindowFullscreen(Context context, boolean actionBar, boolean statusBar) {
@@ -163,8 +183,8 @@ public class DanmakuVideoPlayer extends StandardGSYVideoPlayer {
     }
 
     /**
-     * 处理播放器在退出全屏时，弹幕显示的逻辑
-     * 需要格外注意的是，因为全屏和小屏，是切换了播放器，所以需要同步之间的弹幕状态
+     处理播放器在退出全屏时，弹幕显示的逻辑
+     需要格外注意的是，因为全屏和小屏，是切换了播放器，所以需要同步之间的弹幕状态
      */
     @Override
     protected void resolveNormalVideoShow(View oldF, ViewGroup vp, GSYVideoPlayer gsyVideoPlayer) {
@@ -178,6 +198,25 @@ public class DanmakuVideoPlayer extends StandardGSYVideoPlayer {
                 resolveDanmakuShow();
                 releaseDanmaku(gsyDanmaVideoPlayer);
             }
+        }
+    }
+
+    protected void danmakuOnPause() {
+        if (mDanmakuView != null && mDanmakuView.isPrepared()) {
+            mDanmakuView.pause();
+        }
+    }
+
+    protected void danmakuOnResume() {
+        if (mDanmakuView != null && mDanmakuView.isPrepared() && mDanmakuView.isPaused()) {
+            mDanmakuView.resume();
+        }
+    }
+
+    public void setDanmaKuStream(File is) {
+        mDumakuFile = is;
+        if (!getDanmakuView().isPrepared()) {
+            onPrepareDanmaku((DanmakuVideoPlayer) getCurrentPlayer());
         }
     }
 
@@ -198,8 +237,13 @@ public class DanmakuVideoPlayer extends StandardGSYVideoPlayer {
                 .setMaximumLines(maxLinesPair)
                 .preventOverlapping(overlappingEnablePair);
         if (mDanmakuView != null) {
-            //todo 替换成你的数据流
+            if (mDumakuFile != null) {
+                mParser = createParser(getIsStream(mDumakuFile));
+            }
+
+            //todo 这是为了demo效果，实际上需要去掉这个，外部传输文件进来
             mParser = createParser(this.getResources().openRawResource(R.raw.comments));
+
             mDanmakuView.setCallback(new master.flame.danmaku.controller.DrawHandler.Callback() {
                 @Override
                 public void updateTimer(DanmakuTimer timer) {
@@ -230,8 +274,32 @@ public class DanmakuVideoPlayer extends StandardGSYVideoPlayer {
         }
     }
 
+    private InputStream getIsStream(File file) {
+        try {
+            InputStream instream = new FileInputStream(file);
+            InputStreamReader inputreader = new InputStreamReader(instream);
+            BufferedReader buffreader = new BufferedReader(inputreader);
+            String line;
+            StringBuilder sb1 = new StringBuilder();
+            sb1.append("<i>");
+            //分行读取
+            while ((line = buffreader.readLine()) != null) {
+                sb1.append(line);
+            }
+            sb1.append("</i>");
+            Log.e("3333333", sb1.toString());
+            instream.close();
+            return new ByteArrayInputStream(sb1.toString().getBytes());
+        } catch (java.io.FileNotFoundException e) {
+            Log.d("TestFile", "The File doesn't not exist.");
+        } catch (IOException e) {
+            Log.d("TestFile", e.getMessage());
+        }
+        return null;
+    }
+
     /**
-     * 弹幕的显示与关闭
+     弹幕的显示与关闭
      */
     private void resolveDanmakuShow() {
         post(new Runnable() {
@@ -252,30 +320,29 @@ public class DanmakuVideoPlayer extends StandardGSYVideoPlayer {
     }
 
     /**
-     * 开始播放弹幕
+     开始播放弹幕
      */
     private void onPrepareDanmaku(DanmakuVideoPlayer gsyVideoPlayer) {
-        if (gsyVideoPlayer.getDanmakuView() != null && !gsyVideoPlayer.getDanmakuView().isPrepared()) {
+        if (gsyVideoPlayer.getDanmakuView() != null && !gsyVideoPlayer.getDanmakuView().isPrepared() && gsyVideoPlayer.getParser() != null) {
             gsyVideoPlayer.getDanmakuView().prepare(gsyVideoPlayer.getParser(),
                     gsyVideoPlayer.getDanmakuContext());
         }
     }
 
     /**
-     * 弹幕偏移
+     弹幕偏移
      */
     private void resolveDanmakuSeek(DanmakuVideoPlayer gsyVideoPlayer, long time) {
-        if (getGSYVideoManager().getMediaPlayer() != null && mHadPlay
-                && gsyVideoPlayer.getDanmakuView() != null && gsyVideoPlayer.getDanmakuView().isPrepared()) {
+        if (mHadPlay && gsyVideoPlayer.getDanmakuView() != null && gsyVideoPlayer.getDanmakuView().isPrepared()) {
             gsyVideoPlayer.getDanmakuView().seekTo(time);
         }
     }
 
     /**
-     * 创建解析器对象，解析输入流
-     *
-     * @param stream
-     * @return
+     创建解析器对象，解析输入流
+
+     @param stream
+     @return
      */
     private BaseDanmakuParser createParser(InputStream stream) {
 
@@ -304,7 +371,7 @@ public class DanmakuVideoPlayer extends StandardGSYVideoPlayer {
     }
 
     /**
-     * 释放弹幕控件
+     释放弹幕控件
      */
     private void releaseDanmaku(DanmakuVideoPlayer danmakuVideoPlayer) {
         if (danmakuVideoPlayer != null && danmakuVideoPlayer.getDanmakuView() != null) {
@@ -314,6 +381,11 @@ public class DanmakuVideoPlayer extends StandardGSYVideoPlayer {
     }
 
     public BaseDanmakuParser getParser() {
+        if (mParser == null) {
+            if (mDumakuFile != null) {
+                mParser = createParser(getIsStream(mDumakuFile));
+            }
+        }
         return mParser;
     }
 
@@ -342,7 +414,7 @@ public class DanmakuVideoPlayer extends StandardGSYVideoPlayer {
     }
 
     /**
-     * 模拟添加弹幕数据
+     模拟添加弹幕数据
      */
     private void addDanmaku(boolean islive) {
         BaseDanmaku danmaku = mDanmakuContext.mDanmakuFactory.createDanmaku(BaseDanmaku.TYPE_SCROLL_RL);

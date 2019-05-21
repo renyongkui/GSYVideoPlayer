@@ -3,7 +3,7 @@ package com.example.gsyvideoplayer;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.transition.Explode;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -257,8 +257,13 @@ public class ListADVideoActivity extends AppCompatActivity {
                     holder.adVideoPlayer.getCurrentPlayer().release();
                     holder.adVideoPlayer.onVideoReset();
                     holder.adVideoPlayer.setVisibility(View.GONE);
+
                     //开始播放原视频，根据是否处于全屏状态判断
-                    holder.gsyVideoPlayer.getCurrentPlayer().startAfterPrepared();
+                    int playPosition = holder.gsyVideoPlayer.getGSYVideoManager().getPlayPosition();
+                    if (position == playPosition) {
+                        holder.gsyVideoPlayer.getCurrentPlayer().startAfterPrepared();
+                    }
+
                     if (holder.adVideoPlayer.getCurrentPlayer().isIfCurrentIsFullscreen()) {
                         holder.adVideoPlayer.removeFullWindowViewOnly();
                         if (!holder.gsyVideoPlayer.getCurrentPlayer().isIfCurrentIsFullscreen()) {

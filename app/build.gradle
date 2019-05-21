@@ -10,11 +10,13 @@ android {
     defaultConfig {
         applicationId "com.example.gsyvideoplayer"
 
+        multiDexEnabled true
+
         minSdkVersion globalConfiguration.androidMinSdkVersion
         targetSdkVersion globalConfiguration.androidTargetSdkVersion
 
-        versionCode 5
-        versionName "4.0.0"
+        versionCode 6
+        versionName "5.0.0"
 
         javaCompileOptions {
             annotationProcessorOptions.includeCompileClasspath = true
@@ -26,10 +28,21 @@ android {
 
     }
 
+
+    signingConfigs {
+        releaseConfig {
+            storeFile file("../debug.jks")
+            storePassword "123456"
+            keyAlias "debug"
+            keyPassword "123456"
+        }
+    }
+
     buildTypes {
 
         release {
             minifyEnabled false
+            signingConfig signingConfigs.releaseConfig
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
 
@@ -44,6 +57,13 @@ android {
             jniLibs.srcDirs = ['libs']
         }
     }
+
+    compileOptions { targetCompatibility JavaVersion.VERSION_1_8 }
+
+    lintOptions {
+        abortOnError false
+    }
+
 }
 
 dependencies {
@@ -52,7 +72,6 @@ dependencies {
     def androidDependencies = rootProject.ext.androidDependencies
     def dataDependencies = rootProject.ext.dataDependencies
     annotationProcessor viewDependencies.apt_butterKnife
-    //debugCompile dataDependencies.leakcanary
     implementation viewDependencies.butterKnife
     implementation androidDependencies.recyclerView
     implementation viewDependencies.DanmakuFlameMaster
@@ -65,6 +84,16 @@ dependencies {
     implementation androidDependencies.design
 
     implementation project(':gsyVideoPlayer')
+
+    implementation dataDependencies.okhttpUtil
+    implementation dataDependencies.okhttp
+
+    implementation(dataDependencies.permissionsdispatcher) {
+        // if you don't use android.app.Fragment you can exclude support for them
+        exclude module: "support-v13"
+    }
+    annotationProcessor dataDependencies.permissionsdispatcherProcessor
+
     //jcenter
     //implementation "com.shuyu:GSYVideoPlayer:$gsyVideoVersion"
 
@@ -77,5 +106,9 @@ dependencies {
     //implementation "com.shuyu:gsyVideoPlayer-x86:$gsyVideoVersion"
 
     //implementation "com.shuyu:gsyVideoPlayer-ex_so:$gsyVideoVersion"
+
+
+    debugImplementation dataDependencies.leakcanary
+    releaseImplementation dataDependencies.leakcanary_no_op
 
 }

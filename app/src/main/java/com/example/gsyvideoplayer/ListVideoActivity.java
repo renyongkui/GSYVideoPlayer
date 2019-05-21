@@ -3,7 +3,7 @@ package com.example.gsyvideoplayer;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.transition.Explode;
 import android.view.Window;
 import android.widget.AbsListView;
@@ -57,7 +57,7 @@ public class ListVideoActivity extends AppCompatActivity {
                     //对应的播放列表TAG
                     if (GSYVideoManager.instance().getPlayTag().equals(ListNormalAdapter.TAG)
                             && (position < firstVisibleItem || position > lastVisibleItem)) {
-                        if(listNormalAdapter.isFull()) {
+                        if(GSYVideoManager.isFullState(ListVideoActivity.this)) {
                             return;
                         }
                         //如果滑出去了上面和下面就是否，和今日头条一样

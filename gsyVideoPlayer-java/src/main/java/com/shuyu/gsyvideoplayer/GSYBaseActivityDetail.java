@@ -2,13 +2,14 @@ package com.shuyu.gsyvideoplayer;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import com.shuyu.gsyvideoplayer.builder.GSYVideoOptionBuilder;
 import com.shuyu.gsyvideoplayer.listener.VideoAllCallBack;
 import com.shuyu.gsyvideoplayer.utils.OrientationUtils;
 import com.shuyu.gsyvideoplayer.video.base.GSYBaseVideoPlayer;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 /**
  * 详情模式播放页面基础类
@@ -83,6 +84,9 @@ public abstract class GSYBaseActivityDetail<T extends GSYBaseVideoPlayer> extend
     protected void onPause() {
         super.onPause();
         getGSYVideoPlayer().getCurrentPlayer().onVideoPause();
+        if (orientationUtils != null) {
+            orientationUtils.setIsPause(true);
+        }
         isPause = true;
     }
 
@@ -90,6 +94,9 @@ public abstract class GSYBaseActivityDetail<T extends GSYBaseVideoPlayer> extend
     protected void onResume() {
         super.onResume();
         getGSYVideoPlayer().getCurrentPlayer().onVideoResume();
+        if (orientationUtils != null) {
+            orientationUtils.setIsPause(false);
+        }
         isPause = false;
     }
 
@@ -124,7 +131,7 @@ public abstract class GSYBaseActivityDetail<T extends GSYBaseVideoPlayer> extend
             throw new NullPointerException("initVideo() or initVideoBuilderMode() first");
         }
         //开始播放了才能旋转和全屏
-        orientationUtils.setEnable(getDetailOrientationRotateAuto());
+        orientationUtils.setEnable(getDetailOrientationRotateAuto() && !isAutoFullWithSize());
         isPlay = true;
     }
 
@@ -257,4 +264,11 @@ public abstract class GSYBaseActivityDetail<T extends GSYBaseVideoPlayer> extend
      * 是否启动旋转横屏，true表示启动
      */
     public abstract boolean getDetailOrientationRotateAuto();
+
+    /**
+     * 是否根据视频尺寸，自动选择竖屏全屏或者横屏全屏，注意，这时候默认旋转无效
+     */
+    public boolean isAutoFullWithSize() {
+        return false;
+    }
 }

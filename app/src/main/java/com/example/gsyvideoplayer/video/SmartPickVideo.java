@@ -1,21 +1,21 @@
 package com.example.gsyvideoplayer.video;
 
 import android.content.Context;
-import android.graphics.Matrix;
-import android.graphics.SurfaceTexture;
 import android.util.AttributeSet;
+import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.danikula.videocache.HttpProxyCacheServer;
 import com.example.gsyvideoplayer.R;
 import com.example.gsyvideoplayer.model.SwitchVideoModel;
 import com.example.gsyvideoplayer.view.LoadingDialog;
 import com.example.gsyvideoplayer.view.SwitchVideoTypeDialog;
+import com.shuyu.gsyvideoplayer.GSYVideoBaseManager;
 import com.shuyu.gsyvideoplayer.GSYVideoManager;
 import com.shuyu.gsyvideoplayer.listener.GSYMediaPlayerListener;
+import com.shuyu.gsyvideoplayer.utils.Debuger;
 import com.shuyu.gsyvideoplayer.video.StandardGSYVideoPlayer;
 import com.shuyu.gsyvideoplayer.video.base.GSYBaseVideoPlayer;
 import com.shuyu.gsyvideoplayer.video.base.GSYVideoPlayer;
@@ -130,6 +130,8 @@ public class SmartPickVideo extends StandardGSYVideoPlayer {
     public GSYBaseVideoPlayer startWindowFullscreen(Context context, boolean actionBar, boolean statusBar) {
         SmartPickVideo sampleVideo = (SmartPickVideo) super.startWindowFullscreen(context, actionBar, statusBar);
         sampleVideo.mSourcePosition = mSourcePosition;
+        sampleVideo.mListItemRect = mListItemRect;
+        sampleVideo.mListItemSize = mListItemSize;
         sampleVideo.mType = mType;
         sampleVideo.mUrlList = mUrlList;
         sampleVideo.mTypeText = mTypeText;
@@ -192,21 +194,6 @@ public class SmartPickVideo extends StandardGSYVideoPlayer {
             mCache = cacheWithPlay;
             mCachePath = cachePath;
             mOriginUrl = url;
-            if (cacheWithPlay && url.startsWith("http") && !url.contains("127.0.0.1") && !url.contains(".m3u8")) {
-                HttpProxyCacheServer proxy = (cachePath != null) ?
-                        mTmpManager.newProxy(getActivityContext().getApplicationContext(), cachePath) : mTmpManager.newProxy(getActivityContext().getApplicationContext());
-                //此处转换了url，然后再赋值给mUrl。
-                url = proxy.getProxyUrl(url);
-                mCacheFile = (!url.startsWith("http"));
-                mTmpManager.setProxy(proxy);
-                //注册上缓冲监听
-                if (!mCacheFile && GSYVideoManager.instance() != null) {
-                    proxy.registerCacheListener(GSYVideoManager.instance(), mOriginUrl);
-                }
-            } else if (!cacheWithPlay && (!url.startsWith("http") && !url.startsWith("rtmp")
-                    && !url.startsWith("rtsp") && !url.contains(".m3u8"))) {
-                mCacheFile = true;
-            }
             this.mUrl = url;
         }
     }
@@ -216,8 +203,8 @@ public class SmartPickVideo extends StandardGSYVideoPlayer {
         @Override
         public void onPrepared() {
             if (mTmpManager != null) {
-                mTmpManager.getMediaPlayer().start();
-                mTmpManager.getMediaPlayer().seekTo(getCurrentPositionWhenPlaying());
+                mTmpManager.start();
+                mTmpManager.seekTo(getCurrentPositionWhenPlaying());
             }
         }
 
@@ -239,13 +226,19 @@ public class SmartPickVideo extends StandardGSYVideoPlayer {
         @Override
         public void onSeekComplete() {
             if (mTmpManager != null) {
-                GSYVideoManager.instance().releaseMediaPlayer();
+                GSYVideoBaseManager manager = GSYVideoManager.instance();
                 GSYVideoManager.changeManager(mTmpManager);
-                mTmpManager.setLastListener(SmartPickVideo.this);
-                mTmpManager.setListener(SmartPickVideo.this);
+                mTmpManager.setLastListener(manager.lastListener());
+                mTmpManager.setListener(manager.listener());
+
+                manager.setDisplay(null);
+
+                Debuger.printfError("**** showDisplay onSeekComplete ***** " + mSurface);
+                Debuger.printfError("**** showDisplay onSeekComplete isValid***** " + mSurface.isValid());
                 mTmpManager.setDisplay(mSurface);
                 changeUiToPlayingClear();
                 resolveChangedResult();
+                manager.releaseMediaPlayer();
             }
         }
 
@@ -299,8 +292,7 @@ public class SmartPickVideo extends StandardGSYVideoPlayer {
         final String name = mUrlList.get(position).getName();
         if (mSourcePosition != position) {
             if ((mCurrentState == GSYVideoPlayer.CURRENT_STATE_PLAYING
-                    || mCurrentState == GSYVideoPlayer.CURRENT_STATE_PAUSE)
-                    && GSYVideoManager.instance().getMediaPlayer() != null) {
+                    || mCurrentState == GSYVideoPlayer.CURRENT_STATE_PAUSE)) {
                 showLoading();
                 final String url = mUrlList.get(position).getUrl();
                 cancelProgressTimer();
@@ -315,8 +307,9 @@ public class SmartPickVideo extends StandardGSYVideoPlayer {
                 mSourcePosition = position;
                 //创建临时管理器执行加载播放
                 mTmpManager = GSYVideoManager.tmpInstance(gsyMediaPlayerListener);
+                mTmpManager.initContext(getContext().getApplicationContext());
                 resolveChangeUrl(mCache, mCachePath, url);
-                mTmpManager.prepare(mUrl, mMapHeadData, mLooping, mSpeed);
+                mTmpManager.prepare(mUrl, mMapHeadData, mLooping, mSpeed, mCache, mCachePath, null);
                 changeUiToPlayingBufferingShow();
             }
         } else {
@@ -355,4 +348,13 @@ public class SmartPickVideo extends StandardGSYVideoPlayer {
         }
     }
 
+    @Override
+    public boolean onSurfaceDestroyed(Surface surface) {
+        //清空释放
+        setDisplay(null);
+        //同一消息队列中去release
+        //todo 需要处理为什么全屏时全屏的surface会被释放了
+        //releaseSurface(surface);
+        return true;
+    }
 }

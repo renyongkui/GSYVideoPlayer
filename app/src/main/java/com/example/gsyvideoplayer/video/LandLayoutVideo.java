@@ -2,11 +2,14 @@ package com.example.gsyvideoplayer.video;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.example.gsyvideoplayer.R;
+import com.shuyu.gsyvideoplayer.utils.Debuger;
 import com.shuyu.gsyvideoplayer.video.StandardGSYVideoPlayer;
 import com.shuyu.gsyvideoplayer.video.base.GSYBaseVideoPlayer;
 import com.shuyu.gsyvideoplayer.video.base.GSYVideoPlayer;
@@ -16,6 +19,8 @@ import com.shuyu.gsyvideoplayer.video.base.GSYVideoPlayer;
  * CustomGSYVideoPlayer是试验中，建议使用的时候使用StandardGSYVideoPlayer
  */
 public class LandLayoutVideo extends StandardGSYVideoPlayer {
+
+    private boolean isLinkScroll = false;
 
     /**
      * 1.5.0开始加入，如果需要不同布局区分功能，需要重载
@@ -32,6 +37,38 @@ public class LandLayoutVideo extends StandardGSYVideoPlayer {
         super(context, attrs);
     }
 
+
+    @Override
+    protected void init(Context context) {
+        super.init(context);
+        post(new Runnable() {
+            @Override
+            public void run() {
+                gestureDetector = new GestureDetector(getContext().getApplicationContext(), new GestureDetector.SimpleOnGestureListener() {
+                    @Override
+                    public boolean onDoubleTap(MotionEvent e) {
+                        touchDoubleUp();
+                        return super.onDoubleTap(e);
+                    }
+
+                    @Override
+                    public boolean onSingleTapConfirmed(MotionEvent e) {
+                        if (!mChangePosition && !mChangeVolume && !mBrightness) {
+                            onClickUiToggle();
+                        }
+                        Debuger.printfError("555a","9999999999999999999999");
+                        return super.onSingleTapConfirmed(e);
+                    }
+
+                    @Override
+                    public void onLongPress(MotionEvent e) {
+                        super.onLongPress(e);
+                        Debuger.printfError("555a","0000000000000000000000");
+                    }
+                });
+            }
+        });
+    }
 
     //这个必须配置最上面的构造才能生效
     @Override
@@ -70,5 +107,25 @@ public class LandLayoutVideo extends StandardGSYVideoPlayer {
         return R.drawable.custom_shrink;
     }
 
+    @Override
+    public boolean onInterceptTouchEvent(MotionEvent ev) {
+        if (isLinkScroll && !isIfCurrentIsFullscreen()) {
+            getParent().requestDisallowInterceptTouchEvent(true);
+        }
+        return super.onInterceptTouchEvent(ev);
+    }
 
+
+    @Override
+    protected void resolveNormalVideoShow(View oldF, ViewGroup vp, GSYVideoPlayer gsyVideoPlayer) {
+        LandLayoutVideo landLayoutVideo = (LandLayoutVideo)gsyVideoPlayer;
+        landLayoutVideo.dismissProgressDialog();
+        landLayoutVideo.dismissVolumeDialog();
+        landLayoutVideo.dismissBrightnessDialog();
+        super.resolveNormalVideoShow(oldF, vp, gsyVideoPlayer);
+    }
+
+    public void setLinkScroll(boolean linkScroll) {
+        isLinkScroll = linkScroll;
+    }
 }

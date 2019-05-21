@@ -59,6 +59,9 @@ public class GSYVideoOptionBuilder {
     //是否使用全屏动画效果
     protected boolean mShowFullAnimation = true;
 
+    //是否根据视频尺寸，自动选择竖屏全屏或者横屏全屏，注意，这时候默认旋转无效
+    protected boolean mAutoFullWithSize = false;
+
     //是否需要显示流量提示
     protected boolean mNeedShowWifiTip = true;
 
@@ -119,6 +122,9 @@ public class GSYVideoOptionBuilder {
     //视频title
     protected String mVideoTitle = null;
 
+    // 是否需要覆盖拓展类型
+    protected String mOverrideExtension;
+
     //是否自定义的缓冲文件路径
     protected File mCachePath;
 
@@ -155,6 +161,16 @@ public class GSYVideoOptionBuilder {
     //进度回调
     protected GSYVideoProgressListener mGSYVideoProgressListener;
 
+
+    /**
+     * 是否根据视频尺寸，自动选择竖屏全屏或者横屏全屏，注意，这时候默认旋转无效
+     *
+     * @param autoFullWithSize 默认false
+     */
+    public GSYVideoOptionBuilder setAutoFullWithSize(boolean autoFullWithSize) {
+        this.mAutoFullWithSize = autoFullWithSize;
+        return this;
+    }
 
     /**
      * 全屏动画
@@ -515,8 +531,19 @@ public class GSYVideoOptionBuilder {
     }
 
     /**
-     * 在播放前才真正执行setup
+     * 是否需要覆盖拓展类型，目前只针对exoPlayer内核模式有效
+     * @param overrideExtension 比如传入 m3u8,mp4,avi 等类型
      */
+    public GSYVideoOptionBuilder setOverrideExtension(String overrideExtension) {
+        this.mOverrideExtension = overrideExtension;
+        return this;
+    }
+
+    /**
+     * 在播放前才真正执行setup
+     * 目前弃用，请使用正常setup
+     */
+    @Deprecated
     public GSYVideoOptionBuilder setSetUpLazy(boolean setUpLazy) {
         this.mSetUpLazy = setUpLazy;
         return this;
@@ -585,6 +612,8 @@ public class GSYVideoOptionBuilder {
         if (mGSYVideoProgressListener != null) {
             gsyVideoPlayer.setGSYVideoProgressListener(mGSYVideoProgressListener);
         }
+        gsyVideoPlayer.setOverrideExtension(mOverrideExtension);
+        gsyVideoPlayer.setAutoFullWithSize(mAutoFullWithSize);
         gsyVideoPlayer.setRotateViewAuto(mRotateViewAuto);
         gsyVideoPlayer.setLockLand(mLockLand);
         gsyVideoPlayer.setSpeed(mSpeed, mSounchTouch);

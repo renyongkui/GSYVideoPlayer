@@ -2,9 +2,9 @@ package com.example.gsyvideoplayer.utils;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.util.Pair;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.ActivityOptionsCompat;
+import androidx.core.util.Pair;
 import android.view.View;
 
 import com.example.gsyvideoplayer.AutoPlayRecyclerViewActivity;
@@ -18,7 +18,7 @@ import com.example.gsyvideoplayer.DetailMoreTypeActivity;
 import com.example.gsyvideoplayer.DetailPlayer;
 import com.example.gsyvideoplayer.FragmentVideoActivity;
 import com.example.gsyvideoplayer.InputUrlDetailActivity;
-import com.example.gsyvideoplayer.ListADVideoActivity;
+import com.example.gsyvideoplayer.ListADVideoActivity2;
 import com.example.gsyvideoplayer.ListMultiVideoActivity;
 import com.example.gsyvideoplayer.ListVideo2Activity;
 import com.example.gsyvideoplayer.ListVideoActivity;
@@ -31,6 +31,8 @@ import com.example.gsyvideoplayer.RecyclerViewActivity;
 import com.example.gsyvideoplayer.ScrollingActivity;
 import com.example.gsyvideoplayer.WebDetailActivity;
 import com.example.gsyvideoplayer.WindowActivity;
+import com.example.gsyvideoplayer.exo.DetailExoListPlayer;
+import com.example.gsyvideoplayer.switchplay.SwitchListVideoActivity;
 
 /**
  * Created by shuyu on 2016/11/11.
@@ -200,7 +202,8 @@ public class JumpUtils {
      * @param activity
      */
     public static void goToADListVideoPlayer(Activity activity) {
-        Intent intent = new Intent(activity, ListADVideoActivity.class);
+        //Intent intent = new Intent(activity, ListADVideoActivity.class);
+        Intent intent = new Intent(activity, ListADVideoActivity2.class);
         ActivityOptionsCompat activityOptions = ActivityOptionsCompat.makeSceneTransitionAnimation(activity);
         ActivityCompat.startActivity(activity, intent, activityOptions.toBundle());
     }
@@ -227,6 +230,17 @@ public class JumpUtils {
         Intent intent = new Intent(activity, DetailListPlayer.class);
         activity.startActivity(intent);
     }
+
+    /**
+     * 跳转到详情播放
+     *
+     * @param activity
+     */
+    public static void goToDetailExoListPlayer(Activity activity) {
+        Intent intent = new Intent(activity, DetailExoListPlayer.class);
+        activity.startActivity(intent);
+    }
+
 
 
     /**
@@ -309,6 +323,12 @@ public class JumpUtils {
      */
     public static void gotoFilter(Activity activity) {
         Intent intent = new Intent(activity, DetailFilterActivity.class);
+        activity.startActivity(intent);
+    }
+
+
+    public static void goToSwitch(Activity activity) {
+        Intent intent = new Intent(activity, SwitchListVideoActivity.class);
         activity.startActivity(intent);
     }
 

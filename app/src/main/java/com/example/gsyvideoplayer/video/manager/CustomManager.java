@@ -9,13 +9,13 @@ import android.view.Window;
 
 import com.example.gsyvideoplayer.R;
 import com.shuyu.gsyvideoplayer.GSYVideoBaseManager;
+import com.shuyu.gsyvideoplayer.player.IPlayerManager;
+import com.shuyu.gsyvideoplayer.player.IjkPlayerManager;
 import com.shuyu.gsyvideoplayer.utils.CommonUtil;
 import com.shuyu.gsyvideoplayer.video.base.GSYVideoPlayer;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import tv.danmaku.ijk.media.player.IjkLibLoader;
 
 import static com.shuyu.gsyvideoplayer.utils.CommonUtil.hideNavKey;
 
@@ -34,13 +34,15 @@ public class CustomManager extends GSYVideoBaseManager {
 
     private static Map<String, CustomManager> sMap = new HashMap<>();
 
-    /***
-     * @param libLoader 是否使用外部动态加载so
-     * */
-    public CustomManager(IjkLibLoader libLoader) {
-        init(libLoader);
+
+    public CustomManager() {
+        init();
     }
 
+    @Override
+    protected IPlayerManager getPlayManager() {
+        return new IjkPlayerManager();
+    }
 
     /**
      * 退出全屏，主要用于返回键
@@ -120,7 +122,7 @@ public class CustomManager extends GSYVideoBaseManager {
         }
         CustomManager customManager = sMap.get(key);
         if (customManager == null) {
-            customManager = new CustomManager(null);
+            customManager = new CustomManager();
             sMap.put(key, customManager);
         }
         return customManager;

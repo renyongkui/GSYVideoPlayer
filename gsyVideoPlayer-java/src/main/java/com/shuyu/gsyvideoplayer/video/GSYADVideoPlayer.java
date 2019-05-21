@@ -9,16 +9,12 @@ import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.danikula.videocache.HttpProxyCacheServer;
 import com.shuyu.gsyvideoplayer.GSYVideoADManager;
 import com.shuyu.gsyvideoplayer.R;
 import com.shuyu.gsyvideoplayer.utils.CommonUtil;
 import com.shuyu.gsyvideoplayer.video.base.GSYBaseVideoPlayer;
 import com.shuyu.gsyvideoplayer.video.base.GSYVideoViewBridge;
 
-import java.io.File;
-
-import tv.danmaku.ijk.media.player.IjkLibLoader;
 
 /**
  * Created by guoshuyu on 2018/2/1.
@@ -66,14 +62,9 @@ public class GSYADVideoPlayer extends StandardGSYVideoPlayer {
         return R.layout.video_layout_ad;
     }
 
-
-    @Override
-    public void setIjkLibLoader(IjkLibLoader libLoader) {
-        GSYVideoADManager.setIjkLibLoader(libLoader);
-    }
-
     @Override
     public GSYVideoViewBridge getGSYVideoManager() {
+        GSYVideoADManager.instance().initContext(getContext().getApplicationContext());
         return GSYVideoADManager.instance();
     }
 
@@ -86,12 +77,6 @@ public class GSYADVideoPlayer extends StandardGSYVideoPlayer {
     protected void releaseVideos() {
         GSYVideoADManager.releaseAllVideos();
     }
-
-    @Override
-    protected HttpProxyCacheServer getProxy(Context context, File file) {
-        return GSYVideoADManager.getProxy(context, file);
-    }
-
 
     @Override
     protected int getFullId() {

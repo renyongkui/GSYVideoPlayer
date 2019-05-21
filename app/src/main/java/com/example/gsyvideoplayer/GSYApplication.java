@@ -1,46 +1,75 @@
 package com.example.gsyvideoplayer;
 
-import android.app.Application;
+import android.net.Uri;
 
-import com.shuyu.gsyvideoplayer.GSYVideoManager;
-import com.shuyu.gsyvideoplayer.utils.GSYVideoType;
+import androidx.multidex.MultiDexApplication;
+import tv.danmaku.ijk.media.exo2.Exo2PlayerManager;
+import tv.danmaku.ijk.media.exo2.ExoMediaSourceInterceptListener;
+import tv.danmaku.ijk.media.exo2.ExoSourceManager;
 
-import tv.danmaku.ijk.media.player.IjkMediaPlayer;
+import com.example.gsyvideoplayer.source.CustomSourceTag;
+import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.hls.HlsMediaSource;
+import com.shuyu.gsyvideoplayer.player.PlayerFactory;
+import com.squareup.leakcanary.LeakCanary;
 
-//import com.squareup.leakcanary.LeakCanary;
+import java.io.File;
+
+import static com.google.android.exoplayer2.util.Util.inferContentType;
 
 /**
  * Created by shuyu on 2016/11/11.
  */
 
-public class GSYApplication extends Application {
+public class GSYApplication extends MultiDexApplication {
 
     @Override
     public void onCreate() {
         super.onCreate();
-        //if (LeakCanary.isInAnalyzerProcess(this)) {
+        if (LeakCanary.isInAnalyzerProcess(this)) {
             // This process is dedicated to LeakCanary for heap analysis.
             // You should not init your app in this process.
-            //return;
-        //}
-        //LeakCanary.install(this);
-
+            return;
+        }
+        LeakCanary.install(this);
 
         //GSYVideoType.enableMediaCodec();
         //GSYVideoType.enableMediaCodecTexture();
 
-        //GSYVideoManager.instance().setVideoType(this, GSYVideoType.IJKEXOPLAYER); //EXO 1 播放内核，弃用
-        //GSYVideoManager.instance().setVideoType(this, GSYVideoType.IJKEXOPLAYER2); //EXO 2 播放内核
-        //GSYVideoManager.instance().setVideoType(this, GSYVideoType.SYSTEMPLAYER); //系统播放器
+        //PlayerFactory.setPlayManager(Exo2PlayerManager.class);//EXO模式
+        //ExoSourceManager.setSkipSSLChain(true);
+
+
+        //PlayerFactory.setPlayManager(SystemPlayerManager.class);//系统模式
+        //PlayerFactory.setPlayManager(IjkPlayerManager.class);//ijk模式
+
+        //CacheFactory.setCacheManager(ExoPlayerCacheManager.class);//exo缓存模式，支持m3u8，只支持exo
+        //CacheFactory.setCacheManager(ProxyCacheManager.class);//代理缓存模式，支持所有模式，不支持m3u8等
 
         //GSYVideoType.setShowType(GSYVideoType.SCREEN_MATCH_FULL);
         //GSYVideoType.setShowType(GSYVideoType.SCREEN_TYPE_FULL);
+        //GSYVideoType.setShowType(GSYVideoType.SCREEN_MATCH_FULL);
 
         //GSYVideoType.setRenderType(GSYVideoType.SUFRACE);
         //GSYVideoType.setRenderType(GSYVideoType.GLSURFACE);
 
-        //GSYVideoManager.instance().setLogLevel(IjkMediaPlayer.IJK_LOG_SILENT);
+        //IjkPlayerManager.setLogLevel(IjkMediaPlayer.IJK_LOG_SILENT);
 
-        //GSYVideoType.setShowType(GSYVideoType.SCREEN_MATCH_FULL);
+        /*ExoSourceManager.setExoMediaSourceInterceptListener(new ExoMediaSourceInterceptListener() {
+            @Override
+            public MediaSource getMediaSource(String dataSource, boolean preview, boolean cacheEnable, boolean isLooping, File cacheDir) {
+                Uri contentUri = Uri.parse(dataSource);
+                int contentType = inferContentType(dataSource);
+                switch (contentType) {
+                    case C.TYPE_HLS:
+                        return new HlsMediaSource.Factory(CustomSourceTag.getDataSourceFactory(GSYApplication.this.getApplicationContext(), preview)).createMediaSource(contentUri);
+                }
+                return null;
+            }
+        });*/
+
     }
+
+
 }

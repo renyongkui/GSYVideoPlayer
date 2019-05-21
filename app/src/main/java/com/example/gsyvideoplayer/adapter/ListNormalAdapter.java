@@ -14,9 +14,11 @@ import com.example.gsyvideoplayer.video.SampleCoverVideo;
 import com.shuyu.gsyvideoplayer.GSYVideoManager;
 import com.shuyu.gsyvideoplayer.listener.GSYSampleCallBack;
 import com.shuyu.gsyvideoplayer.utils.Debuger;
+import com.shuyu.gsyvideoplayer.utils.FileUtils;
 import com.shuyu.gsyvideoplayer.utils.OrientationUtils;
 import com.shuyu.gsyvideoplayer.video.StandardGSYVideoPlayer;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -79,8 +81,9 @@ public class ListNormalAdapter extends BaseAdapter {
 
 
         //final String url = "https://res.exexm.com/cw_145225549855002";
-        final String url = "http://9890.vod.myqcloud.com/9890_4e292f9a3dd011e6b4078980237cc3d3.f20.mp4";
-        //final String url = "http://7xse1z.com1.z0.glb.clouddn.com/1491813192";
+        final String urlH = "http://9890.vod.myqcloud.com/9890_4e292f9a3dd011e6b4078980237cc3d3.f20.mp4";
+        final String urlV = "http://wdquan-space.b0.upaiyun.com/VIDEO/2018/11/22/ae0645396048_hls_time10.m3u8";
+        final String url = (position % 2 == 0) ? urlH : urlV;
         //final String url = "http://111.198.24.133:83/yyy_login_server/pic/YB059284/97778276040859/1.mp4";
 
 
@@ -101,7 +104,7 @@ public class ListNormalAdapter extends BaseAdapter {
 
         /************************下方为其他路径************************************/
         //如果一个列表的缓存路劲都一一致
-        //holder.gsyVideoPlayer.setUp(url, true, new File(FileUtils.getTestPath()), "");
+        //holder.gsyVideoPlayer.setUp(url, true, new File(FileUtils.getTestPath()), "这是title");
 
         /************************下方为其他路径************************************/
         //如果一个列表里的缓存路劲不一致
@@ -148,6 +151,7 @@ public class ListNormalAdapter extends BaseAdapter {
         holder.gsyVideoPlayer.setRotateViewAuto(!getListNeedAutoLand());
         holder.gsyVideoPlayer.setLockLand(!getListNeedAutoLand());
         holder.gsyVideoPlayer.setPlayTag(TAG);
+        holder.gsyVideoPlayer.setAutoFullWithSize(true);
         holder.gsyVideoPlayer.setReleaseWhenLossAudio(false);
         holder.gsyVideoPlayer.setShowFullAnimation(!getListNeedAutoLand());
         holder.gsyVideoPlayer.setIsTouchWiget(false);
@@ -247,7 +251,7 @@ public class ListNormalAdapter extends BaseAdapter {
      * @return 返回true为支持列表重力全屏
      */
     public boolean getListNeedAutoLand() {
-        return true;
+        return false;
     }
 
     private void initOrientationUtils(StandardGSYVideoPlayer standardGSYVideoPlayer, boolean full) {

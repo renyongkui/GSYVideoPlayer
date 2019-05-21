@@ -1,10 +1,11 @@
 package com.example.gsyvideoplayer;
 
-import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.support.v4.widget.NestedScrollView;
-import android.support.v7.app.AppCompatActivity;
+
+import androidx.core.widget.NestedScrollView;
+import androidx.appcompat.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -15,10 +16,14 @@ import com.shuyu.gsyvideoplayer.listener.GSYSampleCallBack;
 import com.shuyu.gsyvideoplayer.video.base.GSYVideoPlayer;
 import com.shuyu.gsyvideoplayer.listener.LockClickListener;
 import com.shuyu.gsyvideoplayer.utils.OrientationUtils;
-import com.shuyu.gsyvideoplayer.video.StandardGSYVideoPlayer;
+import com.zhy.http.okhttp.OkHttpUtils;
+import com.zhy.http.okhttp.callback.FileCallBack;
+
+import java.io.File;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import okhttp3.Call;
 
 /**
  * Created by guoshuyu on 2017/2/19.
@@ -39,6 +44,7 @@ public class DanmkuVideoActivity extends AppCompatActivity {
 
     private boolean isPlay;
     private boolean isPause;
+    private boolean isDestory;
 
     private OrientationUtils orientationUtils;
 
@@ -98,6 +104,7 @@ public class DanmkuVideoActivity extends AppCompatActivity {
                 //开始播放了才能旋转和全屏
                 orientationUtils.setEnable(true);
                 isPlay = true;
+                getDanmu();
             }
 
             @Override
@@ -168,6 +175,8 @@ public class DanmkuVideoActivity extends AppCompatActivity {
         //GSYPreViewManager.instance().releaseMediaPlayer();
         if (orientationUtils != null)
             orientationUtils.releaseListener();
+
+        isDestory = true;
     }
 
 
@@ -180,6 +189,27 @@ public class DanmkuVideoActivity extends AppCompatActivity {
         }
     }
 
+
+    private void getDanmu() {
+        //下载demo然后设置
+        OkHttpUtils.get().url(TextUtils.concat("http://xingyuyou.com/Public/app/barragefile/","608","barrage.txt").toString())
+                .build()
+                .execute(new FileCallBack(getApplication().getCacheDir().getAbsolutePath(), "barrage.txt")//
+                {
+                    @Override
+                    public void onError(Call call, Exception e, int id) {
+                    }
+
+                    @Override
+                    public void onResponse(File response, int id) {
+                        if (!isDestory) {
+                            ((DanmakuVideoPlayer) danmakuVideoPlayer.getCurrentPlayer()).setDanmaKuStream(response);
+                        }
+
+                    }
+
+                });
+    }
 
     private void resolveNormalVideoUI() {
         //增加title

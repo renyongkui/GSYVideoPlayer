@@ -3,12 +3,8 @@ package com.shuyu.gsyvideoplayer.video.base;
 import android.content.Context;
 import android.util.AttributeSet;
 
-import com.danikula.videocache.HttpProxyCacheServer;
 import com.shuyu.gsyvideoplayer.GSYVideoManager;
 
-import java.io.File;
-
-import tv.danmaku.ijk.media.player.IjkLibLoader;
 
 /**
  * 兼容的空View，目前用于 GSYVideoManager的设置
@@ -33,16 +29,11 @@ public abstract class GSYVideoPlayer extends GSYBaseVideoPlayer {
         super(context, attrs, defStyleAttr);
     }
 
-    /**
-     * 设置自定义so包加载类，必须在setUp之前调用
-     * 不然setUp时会第一次实例化GSYVideoManager
-     */
-    public void setIjkLibLoader(IjkLibLoader libLoader) {
-        GSYVideoManager.setIjkLibLoader(libLoader);
-    }
+    /*******************************下面方法为管理器和播放控件交互的方法****************************************/
 
     @Override
     public GSYVideoViewBridge getGSYVideoManager() {
+        GSYVideoManager.instance().initContext(getContext().getApplicationContext());
         return GSYVideoManager.instance();
     }
 
@@ -54,11 +45,6 @@ public abstract class GSYVideoPlayer extends GSYBaseVideoPlayer {
     @Override
     protected void releaseVideos() {
         GSYVideoManager.releaseAllVideos();
-    }
-
-    @Override
-    protected HttpProxyCacheServer getProxy(Context context, File file) {
-        return GSYVideoManager.getProxy(context, file);
     }
 
     @Override
